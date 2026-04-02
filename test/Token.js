@@ -4,11 +4,16 @@ const { expect } = require("chai");
 const tokens = (n) => {
     return ethers.utils.parseUnits(n.toString(), "ether")
 }
+
 describe("Token", () => {
-    let token
+    let token, deployer, totalSupply
 
     beforeEach(async () => {
-        //Fetch token from Blockchain
+        const accounts = await ethers.getSigners()
+        deployer = accounts[0]
+
+        totalSupply = tokens("1000000")
+
         const Token = await ethers.getContractFactory("Token")
         token = await Token.deploy("Dapp University", "DAPP", "1000000")
     })
@@ -26,7 +31,10 @@ describe("Token", () => {
     })
 
     it("has correct total supply", async () => {
-        expect(await token.totalSupply()).to.equal(tokens("1000000"))
+        expect(await token.totalSupply()).to.equal(totalSupply)
     })
 
+    it("assigns total supply to deployer", async () => {
+        expect(await token.balanceOf(deployer.address)).to.equal(totalSupply)
+    })
 })
